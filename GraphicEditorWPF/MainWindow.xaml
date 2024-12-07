@@ -1,0 +1,60 @@
+﻿<Window x:Class="GraphicEditorWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GraphicEditorWPF"
+        Name="window"
+        mc:Ignorable="d"
+        Title="edytor graficzny wpf" Height="675" Width="1200">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="2.5*"/>
+        </Grid.ColumnDefinitions>
+
+        <Canvas Grid.Column="1" Name="paintSurface" ClipToBounds="True" MouseMove="paintSurface_MouseMove" MouseLeftButtonDown="paintSurface_MouseLeftButtonDown" MouseDown="paintSurface_MouseDown">
+
+            <Canvas.Background>
+                <SolidColorBrush Color="LightGray" Opacity="1"/>
+            </Canvas.Background>
+            
+        </Canvas>
+
+        <UniformGrid Rows="4">
+            <TextBlock Text="Tutaj będzie przybornik"/>
+            <ToolBarPanel VerticalAlignment="Stretch">
+                <ToolBar>
+                    <Button x:Name="ButtonDraw" Click="ButtonDraw_Click">
+                        Rysowanie
+                    </Button>
+                    <Button x:Name="ButtonDrawPoint" Click="ButtonPointClick">
+                        Rysuowanie punktu
+                    </Button>
+                    
+
+                    <Menu>
+                        <MenuItem Header="ksztalty">
+                            <MenuItem x:Name="buttonDrawLine" Click="ButtonLineClick" Header="Rysowanie linii"/>
+
+                            <MenuItem x:Name="buttonDrawCircle" Click="ButtonCircleClick" Header="Rysowanie kola"/>
+
+                            <MenuItem x:Name="buttonDrawRectangle" Click="ButtonRectangleClick" Header="Rysowanie prostokata"/>
+                            <MenuItem x:Name="buttonDrawPolyogn" Click="ButtonPolygonClick" Header="Rysowanie wielokata"/>
+
+                        </MenuItem>
+                    </Menu>
+
+                    <Menu>
+                        <MenuItem Header="Narzedzia">
+                            <MenuItem Header="Edycja linii" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
+                        </MenuItem>
+                    </Menu>
+
+                </ToolBar>
+            </ToolBarPanel>
+
+        </UniformGrid>
+
+    </Grid>
+</Window>
