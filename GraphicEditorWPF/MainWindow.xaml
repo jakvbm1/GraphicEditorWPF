@@ -22,7 +22,7 @@
         </Canvas>
 
         <UniformGrid Rows="4">
-            <TextBlock Text="Tutaj będzie przybornik"/>
+            
             <ToolBarPanel VerticalAlignment="Stretch">
                 <ToolBar>
                     <Button x:Name="ButtonDraw" Click="ButtonDraw_Click">
@@ -54,6 +54,10 @@
                 </ToolBar>
             </ToolBarPanel>
 
+            <Rectangle Name="ColorSelector" Margin="32" >
+                
+                
+            </Rectangle>
         </UniformGrid>
 
     </Grid>
