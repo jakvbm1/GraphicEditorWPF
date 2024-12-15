@@ -24,7 +24,8 @@ namespace GraphicEditorWPF
         Point? lineStart = null;
         Point currentPoint = new Point();
 
-        Color selectedColor = Colors.Black;
+        private Color selectedColor = Colors.Black;
+        public Color SelectedColor { set { this.selectedColor = value; } get { return selectedColor; } }
 
         private Ellipse end1 = null; //Ends of line while editing it
         private Ellipse end2 = null;

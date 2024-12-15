@@ -5,10 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GraphicEditorWPF"
         mc:Ignorable="d"
-        Title="ColorPickerWindow" Height="300" Width="200">
+        Title="ColorPickerWindow" Height="600" Width="400">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.5*"/>
             <ColumnDefinition/>
+            <ColumnDefinition Width="1.5*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
@@ -21,15 +23,27 @@
         </Grid.RowDefinitions>
 
 
-        <Label Grid.Row="0" Grid.Column="0" Content="Kolor" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Label Grid.Row="0" Grid.Column="0" Content="RGB" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <Label Grid.Row="0" Grid.Column="1" Content="Wartość" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <Label Grid.Row="1" Grid.Column="0" Content="Czerwony" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <Label Grid.Row="2" Grid.Column="0" Content="Niebieski" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
         <Label Grid.Row="3" Grid.Column="0" Content="Zielony" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="RedValue" Text="0"/>
-        <TextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="BlueValue" Text="0"/>
-        <TextBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="GreenValue" Text="0"/>
-        <Button Grid.Row="4" Grid.Column="0" Content="Zastosuj" Margin="8, 16, 8, 16"/>
-        <Button Grid.Row="4" Grid.Column="1" Content="Anuluj" Margin="8, 16, 8, 16"/>
+        <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="RedValue" Text="0" TextChanged="RGBtoHSV"/>
+        <TextBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="BlueValue" Text="0" TextChanged="RGBtoHSV"/>
+        <TextBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="GreenValue" Text="0" TextChanged="RGBtoHSV"/>
+
+        <Label Grid.Row="0" Grid.Column="2" Content="HSV" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Label Grid.Row="1" Grid.Column="2" Content="Odcień" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Label Grid.Row="2" Grid.Column="2" Content="Nasycenie" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Label Grid.Row="3" Grid.Column="2" Content="Wartość" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <Label Grid.Row="0" Grid.Column="3" Content="Wartość" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="HueValue" Text="0" TextChanged="HSVtoRGB"/>
+        <TextBox Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="SaturationValue" Text="0" TextChanged="HSVtoRGB"/>
+        <TextBox Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Name="ValueValue" Text="0" TextChanged="HSVtoRGB"/>
+
+        <Button Grid.Row="4" Grid.Column="0" Content="Zastosuj" Margin="8, 16, 8, 16" Name ="ApplyButton" Click="ApplyButton_Click"/>
+        <Button Grid.Row="4" Grid.Column="2" Content="Anuluj" Margin="8, 16, 8, 16" Name="CancelButton" Click="CancelButton_Click"/>
     </Grid>
 </Window>
