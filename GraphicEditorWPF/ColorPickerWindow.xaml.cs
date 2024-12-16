@@ -20,8 +20,9 @@ namespace GraphicEditorWPF
     /// </summary>
     public partial class ColorPickerWindow : Window
     {
-        private int countforRGB = 3;
-        private int countforHSV = 3;
+        private bool isUpdatingRGB = false;
+        private bool isUpdatingHSV = false;
+
         public ColorPickerWindow()
         {
             InitializeComponent();
@@ -59,8 +60,9 @@ namespace GraphicEditorWPF
         {
             if (RedValue != null && GreenValue != null && BlueValue != null && SaturationValue != null && HueValue != null && ValueValue != null)
             {
-                if (countforRGB >= 3)
+                if (!isUpdatingRGB)
                 {
+                    isUpdatingHSV = true;
                     try
                     {
                         double rp = (double)int.Parse(RedValue.Text) / 255;
@@ -78,12 +80,10 @@ namespace GraphicEditorWPF
                         {
                             hue = 60 * (((gp - bp) / delta) % 6);
                         }
-
                         else if (cMax == gp)
                         {
                             hue = 60 * (((bp - rp) / delta) + 2);
                         }
-
                         else
                         {
                             hue = 60 * (((rp - gp) / delta) + 4);
@@ -99,28 +99,28 @@ namespace GraphicEditorWPF
                         SaturationValue.Text = saturation.ToString();
                         HueValue.Text = hue.ToString();
                         ValueValue.Text = value.ToString();
-                        countforHSV = 0;
+                        updateColorDisplayer();
                     }
                     catch
                     {
                         MessageBox.Show("Wprowadzono nieprawidłowe dane, upewnij się, że wprowadzono poprawne liczby całkowite");
                     }
-                }
-
-                else
-                {
-                    countforRGB++;
+                    finally
+                    {
+                        isUpdatingHSV = false;
+                    }
                 }
             }
         }
 
+
         private void HSVtoRGB(object sender, TextChangedEventArgs e)
         {
-
             if (RedValue != null && GreenValue != null && BlueValue != null && SaturationValue != null && HueValue != null && ValueValue != null)
             {
-                if (countforHSV >= 3)
+                if (!isUpdatingHSV)
                 {
+                    isUpdatingRGB = true;
                     try
                     {
                         double hue = double.Parse(HueValue.Text) / 60;
@@ -140,24 +140,34 @@ namespace GraphicEditorWPF
 
                         double m = v - chroma;
 
-                        RedValue.Text = ((int)(r + m)).ToString();
-                        GreenValue.Text = ((int)(g + m)).ToString();
-                        BlueValue.Text = ((int)(b + m)).ToString();
-                        countforRGB = 0;
+                        RedValue.Text = ((int)((r + m)*255)).ToString();
+                        GreenValue.Text = ((int)((g + m)*255)).ToString();
+                        BlueValue.Text = ((int)((b + m) * 255)).ToString();
+                        updateColorDisplayer();
                     }
-                    catch { MessageBox.Show("Wprowadzono nieprawidłowe dane, upewnij się, że wprowadzono poprawne liczby"); }
-                }
-
-                else
-                {
-                    countforHSV++;
+                    catch
+                    {
+                        MessageBox.Show("Wprowadzono nieprawidłowe dane, upewnij się, że wprowadzono poprawne liczby");
+                    }
+                    finally
+                    {
+                        isUpdatingRGB = false;
+                    }
                 }
             }
         }
 
-        private void HSVtoRGB(object sender, DataTransferEventArgs e)
-        {
 
+        private void updateColorDisplayer()
+        {
+            try
+            {
+                if (RedValue != null && GreenValue != null && BlueValue != null && colorDisplayer != null) {
+                    colorDisplayer.Fill = new SolidColorBrush(Color.FromRgb(byte.Parse(RedValue.Text), byte.Parse(GreenValue.Text), byte.Parse(BlueValue.Text)));
+                }
+            }
+            catch { }
+            
         }
     }
 }
