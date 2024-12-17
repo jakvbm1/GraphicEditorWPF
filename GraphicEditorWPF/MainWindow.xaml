@@ -23,7 +23,7 @@
 
         <UniformGrid Rows="4">
             
-            <ToolBarPanel VerticalAlignment="Stretch">
+            <ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <ToolBar>
                     <Button x:Name="ButtonDraw" Click="ButtonDraw_Click">
                         Rysowanie
@@ -31,7 +31,9 @@
                     <Button x:Name="ButtonDrawPoint" Click="ButtonPointClick">
                         Rysuowanie punktu
                     </Button>
-                    
+                    <Button x:Name="ButtonUploadImage" Click="ButtonUploadImage_Click">
+                        Wstawanie obrazu
+                    </Button>
 
                     <Menu>
                         <MenuItem Header="ksztalty">

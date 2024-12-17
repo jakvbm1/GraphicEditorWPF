@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Emgu.CV;
+
 namespace GraphicEditorWPF
 {
     /// <summary>
@@ -20,6 +23,7 @@ namespace GraphicEditorWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        Image loadedImage;
         int drawStyle = 1;
         Point? lineStart = null;
         Point currentPoint = new Point();
@@ -217,7 +221,7 @@ namespace GraphicEditorWPF
                         Point p5 = new Point(mouseX - polygonSize, mouseY - polygonSize*2);
                         Point p6 = new Point(mouseX - 2*polygonSize, mouseY - 0);
 
-                        polygon.Points = new PointCollection() { p1, p2, p3, p4, p5, p6 };
+                        polygon.Points = new System.Windows.Media.PointCollection() { p1, p2, p3, p4, p5, p6 };
                         Brush brushColor = new SolidColorBrush(selectedColor);
                         polygon.Stroke = brushColor;
                         paintSurface.Children.Add(polygon);
@@ -279,6 +283,17 @@ namespace GraphicEditorWPF
             if (e.ButtonState == MouseButtonState.Pressed) 
             {
              currentPoint =   e.GetPosition(this);
+            }
+        }
+
+        private void ButtonUploadImage_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog od = new OpenFileDialog();
+            od.Filter = "Image Files (*.jpg, *.jpeg, *.png, *.gif) | *.jpg, *.jpeg, *.png, *.gif";
+            if (od.ShowDialog() == true) 
+            {
+                Uri fileUri = new Uri(od.FileName);
+                loadedImage.Source = new BitmapImage(fileUri);
             }
         }
     }
