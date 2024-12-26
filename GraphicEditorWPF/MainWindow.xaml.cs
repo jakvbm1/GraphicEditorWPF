@@ -23,7 +23,7 @@ namespace GraphicEditorWPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        Image loadedImage;
+        Image loadedImage = new Image();
         int drawStyle = 1;
         Point? lineStart = null;
         Point currentPoint = new Point();
@@ -289,11 +289,18 @@ namespace GraphicEditorWPF
         private void ButtonUploadImage_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog od = new OpenFileDialog();
-            od.Filter = "Image Files (*.jpg, *.jpeg, *.png, *.gif) | *.jpg, *.jpeg, *.png, *.gif";
+            od.Filter = "Image Files (*.jpg, *.jpeg, *.png, *.bmp) | *.jpg; *.jpeg; *.png; *.bmp";
             if (od.ShowDialog() == true) 
             {
                 Uri fileUri = new Uri(od.FileName);
                 loadedImage.Source = new BitmapImage(fileUri);
+
+                Canvas.SetTop(loadedImage, 200);
+                Canvas.SetLeft(loadedImage, 200);
+                //paintSurface.Children.Add(loadedImage);
+
+                var iuw = new ImageUploadWindow(new BitmapImage(fileUri));
+                iuw.Show();
             }
         }
     }
