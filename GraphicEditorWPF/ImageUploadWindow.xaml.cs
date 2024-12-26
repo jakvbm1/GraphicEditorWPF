@@ -83,6 +83,20 @@ namespace GraphicEditorWPF
 
         private void MatrixFilter_Click(object sender, RoutedEventArgs e)
         {
+            float[,] filter = generateFilter();
+            Bitmap converted = BitmapImage2Bitmap(bip);
+
+            System.Drawing.Rectangle rectangle = new System.Drawing.Rectangle(0, 0, converted.Width, converted.Height);//System.Drawing
+            BitmapData bmpData = converted.LockBits(rectangle, ImageLockMode.ReadWrite, converted.PixelFormat);//System.Drawing.Imag
+            Image<Bgr, Byte> prefiltered = new Image<Bgr, Byte>(converted.Width, converted.Height, bmpData.Stride, bmpData.Scan0);
+
+            ConvolutionKernelF kernel = new ConvolutionKernelF(filter);
+            Image<Bgr, float> filtered = prefiltered.Convolution(kernel);
+            Bitmap temp = filtered.ToBitmap();
+            this.bip = Bitmap2BitmapImage(temp);
+            ImageSpace.Source = bip;
+
+
 
         }
 
