@@ -23,10 +23,12 @@ namespace GraphicEditorWPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        Image loadedImage = new Image();
+        public Image loadedImage = new Image();
         int drawStyle = 1;
         Point? lineStart = null;
         Point currentPoint = new Point();
+        private bool isDragging = false;
+        private Point clickPosition;
 
         private Color selectedColor = Colors.Black;
         public Color SelectedColor { set { this.selectedColor = value; } get { return selectedColor; } }
@@ -302,6 +304,37 @@ namespace GraphicEditorWPF
                 var iuw = new ImageUploadWindow(new BitmapImage(fileUri));
                 iuw.Show();
             }
+        }
+
+        public void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isDragging = true;
+            clickPosition = e.GetPosition(paintSurface);
+            loadedImage.CaptureMouse();
+        }
+
+        public void Image_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDragging)
+            {
+                Point currentPosition = e.GetPosition(paintSurface);
+                double offsetX = currentPosition.X - clickPosition.X;
+                double offsetY = currentPosition.Y - clickPosition.Y;
+
+                double newLeft = Canvas.GetLeft(loadedImage) + offsetX;
+                double newTop = Canvas.GetTop(loadedImage) + offsetY;
+
+                Canvas.SetLeft(loadedImage, newLeft);
+                Canvas.SetTop(loadedImage, newTop);
+
+                clickPosition = currentPosition;
+            }
+        }
+
+        public void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            isDragging = false;
+            loadedImage.ReleaseMouseCapture();
         }
     }
 }

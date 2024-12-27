@@ -19,7 +19,7 @@
             </Grid.ColumnDefinitions>
 
             <Image Grid.Column="1" Margin="32, 32, 32, 32" Name="ImageSpace">
-                
+
             </Image>
 
             <UniformGrid Grid.Column="0" Rows="6" Columns="3" Margin="8">
@@ -51,6 +51,12 @@
                 <TextBlock Text=" "/>
             </UniformGrid>
         </Grid>
-            
+
+        <UniformGrid Columns="2" Grid.Row="1">
+            <Button x:Name="AddImageButton" Margin="16,16,16,16" Content="Dodaj obrazek na kanwas" Click="AddImageButton_Click"/>
+            <Button x:Name="ScrapeImageButton" Margin="16" Content="Anuluj" Click="ScrapeImageButton_Click"/>
+
+        </UniformGrid>
+
     </Grid>
 </Window>
