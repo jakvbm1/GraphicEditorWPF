@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Emgu.CV.Face;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,19 +15,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using Emgu.CV;
+
 
 namespace GraphicEditorWPF
 {
-    /// <summary>
-    /// Logika interakcji dla klasy MainWindow.xaml
-    /// </summary>
+
     public partial class MainWindow : Window
     {
         public Image loadedImage = new Image();
         int drawStyle = 1;
         Point? lineStart = null;
         Point currentPoint = new Point();
+
+        private Image draggedImage;
         private bool isDragging = false;
         private Point clickPosition;
 
@@ -90,6 +91,24 @@ namespace GraphicEditorWPF
         private void ButtonEditLineClick(object sender, RoutedEventArgs e)
         {
             drawStyle = 7;
+            removeTemporaryObjects();
+        }
+
+        private void ButtonArrowClick(object sender, RoutedEventArgs e)
+        {
+            drawStyle = 8;
+            removeTemporaryObjects();
+        }
+
+        private void ButtonRhombusClick(object sender, RoutedEventArgs e)
+        {
+            drawStyle = 9;
+            removeTemporaryObjects();
+        }
+
+        private void ButtonTrapeziumClick(object sender, RoutedEventArgs e)
+        {
+            drawStyle = 10;
             removeTemporaryObjects();
         }
 
@@ -230,6 +249,60 @@ namespace GraphicEditorWPF
                         break;
                     }
 
+                case 8:
+                    {
+                        if (lineStart is null)
+                        {
+                            lineStart = e.GetPosition(this);
+                        }
+                        else
+                        {
+                            Point start = (Point)lineStart;
+                            Line lineLong = new Line
+                            {
+                                Stroke = new SolidColorBrush(selectedColor),
+                                X1 = start.X - window.Width / 3.5,
+                                Y1 = start.Y,
+                                X2 = e.GetPosition(this).X - window.Width / 3.5,
+                                Y2 = e.GetPosition(this).Y
+                            };
+                            paintSurface.Children.Add(lineLong);
+                            lineStart = null;
+
+                            var nstart = new Point(start.X - window.Width / 3.5, start.Y);
+                            var end = new Point(lineLong.X2, lineLong.Y2);
+                            var direction = end - nstart;
+                            direction.Normalize();
+                            var arrowBase = end - direction * 10;
+                            var normal = new Vector(-direction.Y, direction.X) * 2.5;
+
+                            var arrowHead = new PathFigure
+                            {
+                                StartPoint = end,
+                                Segments = new PathSegmentCollection
+        {
+            new LineSegment(arrowBase + normal, true),
+            new LineSegment(arrowBase - normal, true),
+            new LineSegment(end, true)
+        }
+                            };
+
+                            Path path = new Path
+                            {
+                                Stroke = new SolidColorBrush(selectedColor),
+                                StrokeThickness = 2
+                            };
+
+                            PathGeometry pg = new PathGeometry();
+                            pg.Figures.Add(arrowHead);
+                            path.Data = pg;
+
+                            paintSurface.Children.Add(path);
+                        }
+
+                        break;
+                    }
+
             }
         }
 
@@ -306,16 +379,31 @@ namespace GraphicEditorWPF
             }
         }
 
+        public void uploadImage(BitmapImage bp)
+        {
+            Image uploaded = new Image();
+            uploaded.Source = bp;
+
+            paintSurface.Children.Add(uploaded);
+            uploaded.MouseLeftButtonDown += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonDown;
+            uploaded.MouseMove += ((MainWindow)Application.Current.MainWindow).Image_MouseMove;
+            uploaded.MouseLeftButtonUp += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonUp;
+        }
+
         public void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            isDragging = true;
-            clickPosition = e.GetPosition(paintSurface);
-            loadedImage.CaptureMouse();
+            if (drawStyle == 7)
+            {
+                isDragging = true;
+                draggedImage = sender as Image;
+                clickPosition = e.GetPosition(paintSurface);
+                draggedImage.CaptureMouse();
+            }
         }
 
         public void Image_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDragging)
+            if (isDragging && drawStyle == 7)
             {
                 Point currentPosition = e.GetPosition(paintSurface);
                 double offsetX = currentPosition.X - clickPosition.X;
@@ -323,9 +411,8 @@ namespace GraphicEditorWPF
 
                 double newLeft = Canvas.GetLeft(loadedImage) + offsetX;
                 double newTop = Canvas.GetTop(loadedImage) + offsetY;
-
-                Canvas.SetLeft(loadedImage, newLeft);
-                Canvas.SetTop(loadedImage, newTop);
+                Canvas.SetLeft(draggedImage, e.GetPosition(this).X - window.Width / 3.5);
+                Canvas.SetTop(draggedImage, e.GetPosition(this).Y);
 
                 clickPosition = currentPosition;
             }
@@ -333,8 +420,13 @@ namespace GraphicEditorWPF
 
         public void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+
             isDragging = false;
-            loadedImage.ReleaseMouseCapture();
-        }
+            if (draggedImage != null && drawStyle == 7)
+            {
+                draggedImage.ReleaseMouseCapture();
+                draggedImage = null;
+            }
+            }
     }
 }

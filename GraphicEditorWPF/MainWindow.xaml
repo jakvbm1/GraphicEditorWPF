@@ -22,8 +22,8 @@
         </Canvas>
 
         <UniformGrid Rows="4">
-            
-            <ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <StackPanel>
+                <ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <ToolBar>
                     <Button x:Name="ButtonDraw" Click="ButtonDraw_Click">
                         Rysowanie
@@ -35,27 +35,40 @@
                         Wstawanie obrazu
                     </Button>
 
-                    <Menu>
-                        <MenuItem Header="ksztalty">
-                            <MenuItem x:Name="buttonDrawLine" Click="ButtonLineClick" Header="Rysowanie linii"/>
 
-                            <MenuItem x:Name="buttonDrawCircle" Click="ButtonCircleClick" Header="Rysowanie kola"/>
-
-                            <MenuItem x:Name="buttonDrawRectangle" Click="ButtonRectangleClick" Header="Rysowanie prostokata"/>
-                            <MenuItem x:Name="buttonDrawPolyogn" Click="ButtonPolygonClick" Header="Rysowanie wielokata"/>
-
-                        </MenuItem>
-                    </Menu>
-
-                    <Menu>
-                        <MenuItem Header="Narzedzia">
-                            <MenuItem Header="Edycja linii" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
-                        </MenuItem>
-                    </Menu>
 
                 </ToolBar>
+                
             </ToolBarPanel>
 
+                <ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <ToolBar>
+
+
+                        <Menu>
+                            <MenuItem Header="ksztalty">
+                                <MenuItem x:Name="buttonDrawLine" Click="ButtonLineClick" Header="Rysowanie linii"/>
+
+                                <MenuItem x:Name="buttonDrawCircle" Click="ButtonCircleClick" Header="Rysowanie kola"/>
+
+                                <MenuItem x:Name="buttonDrawRectangle" Click="ButtonRectangleClick" Header="Rysowanie prostokata"/>
+                                <MenuItem x:Name="buttonDrawPolyogn" Click="ButtonPolygonClick" Header="Rysowanie wielokata"/>
+								<MenuItem x:Name="buttonDrawArrow" Click="ButtonArrowClick" Header="Rysowanie Strzalki"/>
+								<MenuItem x:Name="buttonDrawRhombus" Click="ButtonRhombusClick" Header="Rysowanie Rombu"/>
+								<MenuItem x:Name ="buttonDrawTrapezium" Click="ButtonTrapeziumClick" Header ="Rysowanie Trapezu"/>
+                            </MenuItem>
+                        </Menu>
+
+                        <Menu>
+                            <MenuItem Header="Narzedzia">
+                                <MenuItem Header="Edycja linii" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
+                            </MenuItem>
+                        </Menu>
+
+                    </ToolBar>
+
+                </ToolBarPanel>
+            </StackPanel>
             <Rectangle Name="ColorSelector" Margin="32" >
                 
                 

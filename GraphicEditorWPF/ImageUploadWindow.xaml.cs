@@ -135,13 +135,14 @@ namespace GraphicEditorWPF
 
         private void AddImageButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-            image.Source = bip;
-            ((MainWindow)Application.Current.MainWindow).loadedImage.Source = bip;
-            ((MainWindow)Application.Current.MainWindow).paintSurface.Children.Add(image);
-            ((MainWindow)Application.Current.MainWindow).loadedImage.MouseLeftButtonDown += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonDown;
-            ((MainWindow)Application.Current.MainWindow).loadedImage.MouseMove += ((MainWindow)Application.Current.MainWindow).Image_MouseMove;
-            ((MainWindow)Application.Current.MainWindow).loadedImage.MouseLeftButtonUp += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonUp;
+            ((MainWindow)Application.Current.MainWindow).uploadImage(bip);
+            //System.Windows.Controls.Image image = new System.Windows.Controls.Image();
+            //image.Source = bip;
+            //((MainWindow)Application.Current.MainWindow).loadedImage.Source = bip;
+            //((MainWindow)Application.Current.MainWindow).paintSurface.Children.Add(image);
+            //((MainWindow)Application.Current.MainWindow).loadedImage.MouseLeftButtonDown += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonDown;
+            //((MainWindow)Application.Current.MainWindow).loadedImage.MouseMove += ((MainWindow)Application.Current.MainWindow).Image_MouseMove;
+            //((MainWindow)Application.Current.MainWindow).loadedImage.MouseLeftButtonUp += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonUp;
             this.Close();
         }
 
