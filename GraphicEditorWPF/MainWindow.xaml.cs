@@ -219,10 +219,8 @@ namespace GraphicEditorWPF
                         rect.Width=60; rect.Height=40;
                         rect.Stroke = new SolidColorBrush(selectedColor);
                         Canvas.SetTop(rect, e.GetPosition(this).Y - 20);
-                        Canvas.SetLeft(rect, e.GetPosition(this).Y - window.Width / 3.5 - 30);
+                        Canvas.SetLeft(rect, e.GetPosition(this).X - window.Width / 3.5 - 30);
 
-                        Brush brushColor = new SolidColorBrush(Colors.CornflowerBlue);
-                        rect.Stroke = brushColor;
                         paintSurface.Children.Add((rect));
                         break;
                     }
@@ -303,6 +301,51 @@ namespace GraphicEditorWPF
                         break;
                     }
 
+
+                case 9:
+                    {
+                        Polygon polygon = new Polygon();
+                        double mouseX = e.GetPosition(this).X - window.Width / 3.5;
+                        double mouseY = e.GetPosition(this).Y;
+
+                        double polygonSize = 30;
+
+                        Point p1 = new Point(mouseX -1.5*polygonSize , mouseY + Math.Sqrt(3) * polygonSize -0.5*polygonSize);
+                        Point p2 = new Point(mouseX + 0.5* polygonSize, mouseY + Math.Sqrt(3) * polygonSize - 0.5 * polygonSize);
+                        Point p3 = new Point(mouseX + 1.5 * polygonSize, mouseY - 0.5 * polygonSize);
+                        Point p4 = new Point(mouseX - 0.5*polygonSize, mouseY - 0.5 * polygonSize);
+
+
+                        polygon.Points = new System.Windows.Media.PointCollection() { p1, p2, p3, p4 };
+                        Brush brushColor = new SolidColorBrush(selectedColor);
+                        polygon.Stroke = brushColor;
+                        paintSurface.Children.Add(polygon);
+
+                        break;
+                    }
+
+
+                case 10:
+                    {
+                        Polygon polygon = new Polygon();
+                        double mouseX = e.GetPosition(this).X - window.Width / 3.5;
+                        double mouseY = e.GetPosition(this).Y;
+
+                        double polygonSize = 30;
+
+                        Point p1 = new Point(mouseX - 1.5 * polygonSize, mouseY + Math.Sqrt(3) * polygonSize - 0.5 * polygonSize);
+                        Point p2 = new Point(mouseX + 2.5 * polygonSize, mouseY + Math.Sqrt(3) * polygonSize - 0.5 * polygonSize);
+                        Point p3 = new Point(mouseX + 1.5 * polygonSize, mouseY - 0.5 * polygonSize);
+                        Point p4 = new Point(mouseX - 0.5 * polygonSize, mouseY - 0.5 * polygonSize);
+
+
+                        polygon.Points = new System.Windows.Media.PointCollection() { p1, p2, p3, p4 };
+                        Brush brushColor = new SolidColorBrush(selectedColor);
+                        polygon.Stroke = brushColor;
+                        paintSurface.Children.Add(polygon);
+
+                        break;
+                    }
             }
         }
 
