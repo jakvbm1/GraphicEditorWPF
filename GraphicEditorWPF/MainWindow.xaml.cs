@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,6 +112,62 @@ namespace GraphicEditorWPF
             drawStyle = 10;
             removeTemporaryObjects();
         }
+
+        private void PngSaveClick(object sender, RoutedEventArgs e)
+        {
+            // Create a SaveFileDialog to choose the save location and filename
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "PNG Files (*.png)|*.png|JPG Files (*.jpg)|*.jpg";
+            saveFileDialog.DefaultExt = "png";
+            saveFileDialog.AddExtension = true;
+
+            // Show the dialog and get the result
+            bool? result = saveFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = saveFileDialog.FileName;
+                BitmapEncoder encoder;
+
+                if (System.IO.Path.GetExtension(filename).ToLower() == ".jpg")
+                {
+                    encoder = new JpegBitmapEncoder();
+                }
+                else
+                {
+                    encoder = new PngBitmapEncoder();
+                }
+
+                // Set the canvas size if not already set
+                if (double.IsNaN(paintSurface.Width) || double.IsNaN(paintSurface.Height))
+                {
+                    paintSurface.Width = paintSurface.ActualWidth;
+                    paintSurface.Height = paintSurface.ActualHeight;
+                }
+
+                // Create a render bitmap and push the canvas to it
+                RenderTargetBitmap renderBitmap = new RenderTargetBitmap(
+                    (int)paintSurface.Width, (int)paintSurface.Height, 96d, 96d, PixelFormats.Pbgra32);
+
+                // Use a VisualBrush to render the canvas content
+                DrawingVisual drawingVisual = new DrawingVisual();
+                using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+                {
+                    VisualBrush visualBrush = new VisualBrush(paintSurface);
+                    drawingContext.DrawRectangle(visualBrush, null, new Rect(new Point(), new Size(paintSurface.Width, paintSurface.Height)));
+                }
+                renderBitmap.Render(drawingVisual);
+
+                // Create a file stream for saving image
+                using (FileStream fileStream = new FileStream(filename, FileMode.Create))
+                {
+                    encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
+                    encoder.Save(fileStream);
+                }
+            }
+
+        }
+
 
         private void paintSurface_MouseMove(object sender, MouseEventArgs e)
         {
@@ -285,7 +342,7 @@ namespace GraphicEditorWPF
         }
                             };
 
-                            Path path = new Path
+                            System.Windows.Shapes.Path path = new System.Windows.Shapes.Path
                             {
                                 Stroke = new SolidColorBrush(selectedColor),
                                 StrokeThickness = 2
