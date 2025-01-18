@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 
 
@@ -27,6 +28,10 @@ namespace GraphicEditorWPF
         int drawStyle = 1;
         Point? lineStart = null;
         Point currentPoint = new Point();
+        int lineThickness = 5;
+
+        private List<Layer> layers = new List<Layer>();
+        private int activeLayerIndex = 0;
 
         private Image draggedImage;
         private bool isDragging = false;
@@ -41,8 +46,40 @@ namespace GraphicEditorWPF
         public MainWindow()
         {
             InitializeComponent();
+            InitializeLayers();
+            LineThicknessDisplayer.Text = lineThickness.ToString();
             ColorSelector.Fill = new SolidColorBrush(selectedColor);
             ColorSelector.MouseLeftButtonDown += changeColor;
+        }
+
+        private void InitializeLayers()
+        {
+            layers.Add(new Layer("Background"));
+            layers.Add(new Layer("Foreground"));
+
+            foreach (var layer in layers)
+            {
+                paintSurface.Children.Add(layer.LayerCanvas);
+            }
+
+            LayerList.ItemsSource = layers;
+            LayerList.SelectedIndex = 0;
+        }
+
+        private void ToggleLayerVisibility(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            var layer = (Layer)checkBox.DataContext;
+
+            if (layer != null)
+            {
+                layer.LayerCanvas.Visibility = layer.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void LayerList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            activeLayerIndex = LayerList.SelectedIndex;
         }
 
         private void changeColor(object sender, RoutedEventArgs e)
@@ -113,13 +150,40 @@ namespace GraphicEditorWPF
             removeTemporaryObjects();
         }
 
+        private void ButtonDrawBrokenLine(object sender, RoutedEventArgs e)
+        {
+            drawStyle=11;
+            removeTemporaryObjects();
+        }
+        private void AddNewLayer(string name)
+        {
+            var newLayer = new Layer(name);
+            layers.Add(newLayer);
+            paintSurface.Children.Add(newLayer.LayerCanvas);
+            LayerList.Items.Refresh();
+        }
+
+        private void DeleteLayer(int index)
+        {
+            if (index >= 0 && index < layers.Count)
+            {
+                paintSurface.Children.Remove(layers[index].LayerCanvas);
+                layers.RemoveAt(index);
+                LayerList.Items.Refresh();
+            }
+        }
+
+
+
         private void PngSaveClick(object sender, RoutedEventArgs e)
         {
             // Create a SaveFileDialog to choose the save location and filename
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "PNG Files (*.png)|*.png|JPG Files (*.jpg)|*.jpg";
-            saveFileDialog.DefaultExt = "png";
-            saveFileDialog.AddExtension = true;
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "PNG Files (*.png)|*.png|JPG Files (*.jpg)|*.jpg",
+                DefaultExt = "png",
+                AddExtension = true
+            };
 
             // Show the dialog and get the result
             bool? result = saveFileDialog.ShowDialog();
@@ -145,28 +209,42 @@ namespace GraphicEditorWPF
                     paintSurface.Height = paintSurface.ActualHeight;
                 }
 
-                // Create a render bitmap and push the canvas to it
+                // Create a render bitmap for saving the layers
                 RenderTargetBitmap renderBitmap = new RenderTargetBitmap(
                     (int)paintSurface.Width, (int)paintSurface.Height, 96d, 96d, PixelFormats.Pbgra32);
 
-                // Use a VisualBrush to render the canvas content
+                // Use a DrawingVisual to render the layers onto the renderBitmap
                 DrawingVisual drawingVisual = new DrawingVisual();
                 using (DrawingContext drawingContext = drawingVisual.RenderOpen())
                 {
-                    VisualBrush visualBrush = new VisualBrush(paintSurface);
-                    drawingContext.DrawRectangle(visualBrush, null, new Rect(new Point(), new Size(paintSurface.Width, paintSurface.Height)));
+                    foreach (UIElement element in paintSurface.Children)
+                    {
+                        if (element is Visual visualElement)
+                        {
+                            // Render each layer individually
+                            drawingContext.DrawRectangle(
+                                new VisualBrush(visualElement),
+                                null,
+                                new Rect(
+                                    new Point(Canvas.GetLeft(element), Canvas.GetTop(element)),
+                                    new Size(element.RenderSize.Width, element.RenderSize.Height)
+                                ));
+                        }
+                    }
                 }
                 renderBitmap.Render(drawingVisual);
 
-                // Create a file stream for saving image
+                // Create a file stream for saving the image
                 using (FileStream fileStream = new FileStream(filename, FileMode.Create))
                 {
                     encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
                     encoder.Save(fileStream);
                 }
-            }
 
+                MessageBox.Show("Image saved successfully!", "Save Image", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
+
 
 
         private void paintSurface_MouseMove(object sender, MouseEventArgs e)
@@ -180,12 +258,13 @@ namespace GraphicEditorWPF
                     case 1:
                         Line line = new Line();
                         line.Stroke = new SolidColorBrush(selectedColor);
+                        line.StrokeThickness = lineThickness;
                         line.X1 = currentPoint.X - window.Width/3.5;
                         line.Y1 = currentPoint.Y;
                         line.X2 = e.GetPosition(this).X - window.Width / 3.5;
                         line.Y2 = e.GetPosition(this).Y;
                         currentPoint = e.GetPosition(this);
-                        paintSurface.Children.Add(line);
+                        layers[activeLayerIndex].LayerCanvas.Children.Add(line);
                         break;
 
 
@@ -233,7 +312,7 @@ namespace GraphicEditorWPF
                         ellipse.Height = 6;
                         Canvas.SetTop(ellipse, e.GetPosition(this).Y - 3);
                         Canvas.SetLeft(ellipse, e.GetPosition(this).X - window.Width / 3.5 - 3);
-                        paintSurface.Children.Add(ellipse);
+                        layers[activeLayerIndex].LayerCanvas.Children.Add(ellipse);
                         break;
                     }
 
@@ -251,12 +330,14 @@ namespace GraphicEditorWPF
                             lineLong.X2 = e.GetPosition(this).X - window.Width / 3.5;
                             lineLong.Y2 = e.GetPosition(this).Y;
                             lineLong.MouseLeftButtonDown += Line_MouseLeftButtonDown;
-                            paintSurface.Children.Add(lineLong);
+                            layers[activeLayerIndex].LayerCanvas.Children.Add(lineLong);
                             lineStart = null;
                            
                         }
                         break;
                     }
+
+
 
                 case 4:
                     {
@@ -266,7 +347,7 @@ namespace GraphicEditorWPF
                         ellipse.Height = 20;
                         Canvas.SetTop(ellipse, e.GetPosition(this).Y - 10);
                         Canvas.SetLeft(ellipse, e.GetPosition(this).X - window.Width / 3.5 - 20);
-                        paintSurface.Children.Add(ellipse);
+                        layers[activeLayerIndex].LayerCanvas.Children.Add(ellipse);
                         break;
                     }
 
@@ -278,7 +359,7 @@ namespace GraphicEditorWPF
                         Canvas.SetTop(rect, e.GetPosition(this).Y - 20);
                         Canvas.SetLeft(rect, e.GetPosition(this).X - window.Width / 3.5 - 30);
 
-                        paintSurface.Children.Add((rect));
+                        layers[activeLayerIndex].LayerCanvas.Children.Add((rect));
                         break;
                     }
 
@@ -300,7 +381,7 @@ namespace GraphicEditorWPF
                         polygon.Points = new System.Windows.Media.PointCollection() { p1, p2, p3, p4, p5, p6 };
                         Brush brushColor = new SolidColorBrush(selectedColor);
                         polygon.Stroke = brushColor;
-                        paintSurface.Children.Add(polygon);
+                        layers[activeLayerIndex].LayerCanvas.Children.Add(polygon);
                         break;
                     }
 
@@ -321,7 +402,7 @@ namespace GraphicEditorWPF
                                 X2 = e.GetPosition(this).X - window.Width / 3.5,
                                 Y2 = e.GetPosition(this).Y
                             };
-                            paintSurface.Children.Add(lineLong);
+                            layers[activeLayerIndex].LayerCanvas.Children.Add(lineLong);
                             lineStart = null;
 
                             var nstart = new Point(start.X - window.Width / 3.5, start.Y);
@@ -352,7 +433,7 @@ namespace GraphicEditorWPF
                             pg.Figures.Add(arrowHead);
                             path.Data = pg;
 
-                            paintSurface.Children.Add(path);
+                            layers[activeLayerIndex].LayerCanvas.Children.Add(path);
                         }
 
                         break;
@@ -376,7 +457,7 @@ namespace GraphicEditorWPF
                         polygon.Points = new System.Windows.Media.PointCollection() { p1, p2, p3, p4 };
                         Brush brushColor = new SolidColorBrush(selectedColor);
                         polygon.Stroke = brushColor;
-                        paintSurface.Children.Add(polygon);
+                        layers[activeLayerIndex].LayerCanvas.Children.Add(polygon);
 
                         break;
                     }
@@ -399,8 +480,28 @@ namespace GraphicEditorWPF
                         polygon.Points = new System.Windows.Media.PointCollection() { p1, p2, p3, p4 };
                         Brush brushColor = new SolidColorBrush(selectedColor);
                         polygon.Stroke = brushColor;
-                        paintSurface.Children.Add(polygon);
+                        layers[activeLayerIndex].LayerCanvas.Children.Add(polygon);
 
+                        break;
+                    }
+
+                case 11:
+                    {
+                        if (lineStart is null)
+                        { lineStart = e.GetPosition(this); }
+                        else
+                        {
+                            Point start = (Point)lineStart;
+                            Line lineLong = new Line();
+                            lineLong.Stroke = new SolidColorBrush(selectedColor);
+                            lineLong.X1 = start.X - window.Width / 3.5;
+                            lineLong.Y1 = start.Y;
+                            lineLong.X2 = e.GetPosition(this).X - window.Width / 3.5;
+                            lineLong.Y2 = e.GetPosition(this).Y;
+                            layers[activeLayerIndex].LayerCanvas.Children.Add(lineLong);
+                            lineStart = e.GetPosition(this);
+
+                        }
                         break;
                     }
             }
@@ -433,6 +534,7 @@ namespace GraphicEditorWPF
                 end1.MouseLeftButtonDown += LineEndSelected;
                 end2.MouseLeftButtonDown += LineEndSelected;
             }
+
         }
 
         private void LineEndSelected(object sender, MouseButtonEventArgs e)
@@ -528,5 +630,35 @@ namespace GraphicEditorWPF
                 draggedImage = null;
             }
             }
+
+
+        private void AddLayerButton_Click(object sender, RoutedEventArgs e)
+        {
+            int newLayerIndex = layers.Count;
+            AddNewLayer(newLayerIndex.ToString());
+        }
+
+        private void RemoveLayerButton_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteLayer(activeLayerIndex);
+        }
+
+        private void LayerChanged(object sender, RoutedEventArgs e)
+        {
+            activeLayerIndex = LayerList.SelectedIndex;
+        }
+
+        private void ThickLineButton_Click(object sender, RoutedEventArgs e)
+        {
+            lineThickness++;
+            LineThicknessDisplayer.Text = lineThickness.ToString();
+
+        }
+
+        private void ThinLineButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (lineThickness > 1) { lineThickness--; }
+            LineThicknessDisplayer.Text = lineThickness.ToString();
+        }
     }
 }

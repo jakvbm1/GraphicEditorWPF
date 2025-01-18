@@ -36,7 +36,7 @@ namespace GraphicEditorWPF
             {
                 Byte redN = Byte.Parse(RedValue.Text);
                 Byte blueN = Byte.Parse(BlueValue.Text);
-                Byte GreenN = Byte.Parse(RedValue.Text);
+                Byte GreenN = Byte.Parse(GreenValue.Text);
 
 
                 Color color = Color.FromRgb(redN, GreenN, blueN);

@@ -7,74 +7,82 @@
         Name="window"
         mc:Ignorable="d"
         Title="edytor graficzny wpf" Height="675" Width="1200">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="2.5*"/>
-        </Grid.ColumnDefinitions>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition/>
+			<ColumnDefinition Width="2.5*"/>
+		</Grid.ColumnDefinitions>
 
-        <Canvas Grid.Column="1" Name="paintSurface" ClipToBounds="True" MouseMove="paintSurface_MouseMove" MouseLeftButtonDown="paintSurface_MouseLeftButtonDown" MouseDown="paintSurface_MouseDown">
+		<!-- Canvas -->
+		<Canvas Grid.Column="1" Name="paintSurface" ClipToBounds="True" MouseMove="paintSurface_MouseMove" MouseLeftButtonDown="paintSurface_MouseLeftButtonDown" MouseDown="paintSurface_MouseDown">
+			<Canvas.Background>
+				<SolidColorBrush Color="White" Opacity="1"/>
+			</Canvas.Background>
+		</Canvas>
 
-            <Canvas.Background>
-                <SolidColorBrush Color="LightGray" Opacity="1"/>
-            </Canvas.Background>
-            
-        </Canvas>
+		<!-- Sidebar -->
+		<UniformGrid Rows="3">
+			<StackPanel>
+				<!-- Toolbar Section -->
+				<ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+					<ToolBar>
+						<Button x:Name="ButtonDraw" Click="ButtonDraw_Click">Rysowanie</Button>
+						<Button x:Name="ButtonDrawPoint" Click="ButtonPointClick">Rysuowanie punktu</Button>
+						<Button x:Name="ButtonUploadImage" Click="ButtonUploadImage_Click">Wstawanie obrazu</Button>
+					</ToolBar>
+				</ToolBarPanel>
 
-        <UniformGrid Rows="4">
-            <StackPanel>
-                <ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <ToolBar>
-                    <Button x:Name="ButtonDraw" Click="ButtonDraw_Click">
-                        Rysowanie
-                    </Button>
-                    <Button x:Name="ButtonDrawPoint" Click="ButtonPointClick">
-                        Rysuowanie punktu
-                    </Button>
-                    <Button x:Name="ButtonUploadImage" Click="ButtonUploadImage_Click">
-                        Wstawanie obrazu
-                    </Button>
-
-
-
-                </ToolBar>
-                
-            </ToolBarPanel>
-
-                <ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <ToolBar>
-
-
-                        <Menu>
-                            <MenuItem Header="ksztalty">
-                                <MenuItem x:Name="buttonDrawLine" Click="ButtonLineClick" Header="Rysowanie linii"/>
-
-                                <MenuItem x:Name="buttonDrawCircle" Click="ButtonCircleClick" Header="Rysowanie kola"/>
-
-                                <MenuItem x:Name="buttonDrawRectangle" Click="ButtonRectangleClick" Header="Rysowanie prostokata"/>
-                                <MenuItem x:Name="buttonDrawPolyogn" Click="ButtonPolygonClick" Header="Rysowanie wielokata"/>
+				<ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+					<ToolBar>
+						<Menu>
+							<MenuItem Header="ksztalty">
+								<MenuItem x:Name="buttonDrawLine" Click="ButtonLineClick" Header="Rysowanie linii"/>
+								<MenuItem x:Name="buttonDrawBrokenLine" Click="ButtonDrawBrokenLine" Header="Rysowanie linii łamanej"/>
+								<MenuItem x:Name="buttonDrawCircle" Click="ButtonCircleClick" Header="Rysowanie kola"/>
+								<MenuItem x:Name="buttonDrawRectangle" Click="ButtonRectangleClick" Header="Rysowanie prostokata"/>
+								<MenuItem x:Name="buttonDrawPolyogn" Click="ButtonPolygonClick" Header="Rysowanie wielokata"/>
 								<MenuItem x:Name="buttonDrawArrow" Click="ButtonArrowClick" Header="Rysowanie Strzalki"/>
 								<MenuItem x:Name="buttonDrawRhombus" Click="ButtonRhombusClick" Header="Rysowanie Rombu"/>
-								<MenuItem x:Name ="buttonDrawTrapezium" Click="ButtonTrapeziumClick" Header ="Rysowanie Trapezu"/>
-                            </MenuItem>
-                        </Menu>
+								<MenuItem x:Name="buttonDrawTrapezium" Click="ButtonTrapeziumClick" Header="Rysowanie Trapezu"/>
+							</MenuItem>
+						</Menu>
+						<Menu>
+							<MenuItem Header="Narzedzia">
+								<MenuItem Header="Edycja linii" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
+								<MenuItem Header="Zapis do png" x:Name="ButtonPNGSave" Click="PngSaveClick"/>
+							</MenuItem>
+						</Menu>
+					</ToolBar>
+				</ToolBarPanel>
 
-                        <Menu>
-                            <MenuItem Header="Narzedzia">
-                                <MenuItem Header="Edycja linii" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
-                                <MenuItem Header="Zapis do png" x:Name="ButtonPNGSave" Click="PngSaveClick"/>
-                            </MenuItem>
-                        </Menu>
+				<ToolBarPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+					<ToolBar>
+						<TextBlock Text="Grubość Linii" />
+						<Button Name="ThinLineButton" Content="-" Click="ThinLineButton_Click"></Button>
+						<TextBlock Text ="0" Name="LineThicknessDisplayer"/>
+						<Button Name="ThickLineButton" Content="+" Click="ThickLineButton_Click"></Button>
+					</ToolBar>
+				</ToolBarPanel>
+			</StackPanel>
 
-                    </ToolBar>
+			<!-- Layer Management Section -->
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition/>
+					<RowDefinition Height ="2*"/>
+					<RowDefinition/>
+					<RowDefinition/>
 
-                </ToolBarPanel>
-            </StackPanel>
-            <Rectangle Name="ColorSelector" Margin="32" >
-                
-                
-            </Rectangle>
-        </UniformGrid>
+				</Grid.RowDefinitions>
+				<TextBlock Grid.Row="0" Text="Zarządzanie warstwami" FontWeight="Bold" FontSize="16" Margin="5"/>
+				<ListBox Grid.Row="1" Name="LayerList"  Margin="10" SelectionChanged ="LayerChanged"/>
+				<Button Grid.Row="2" Content="Dodaj warstwę" Name="AddLayerButton" Margin="5,5,5,0"  VerticalAlignment="Top" Click="AddLayerButton_Click"/>
+                <Button Grid.Row="3" Content="Usuń warstwę" Name="RemoveLayerButton"  Margin="5"  VerticalAlignment="Top" Click="RemoveLayerButton_Click"/>
 
-    </Grid>
+			</Grid>
+
+			<!-- Existing Color Selector -->
+			<Rectangle Name="ColorSelector" Margin="32"/>
+		</UniformGrid>
+	</Grid>
 </Window>
