@@ -48,7 +48,7 @@
 						</Menu>
 						<Menu>
 							<MenuItem Header="Narzedzia">
-								<MenuItem Header="Edycja linii" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
+								<MenuItem Header="Edycja istniejących obiektów" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
 								<MenuItem Header="Zapis do png" x:Name="ButtonPNGSave" Click="PngSaveClick"/>
 							</MenuItem>
 						</Menu>

@@ -54,8 +54,8 @@ namespace GraphicEditorWPF
 
         private void InitializeLayers()
         {
-            layers.Add(new Layer("Background"));
-            layers.Add(new Layer("Foreground"));
+            layers.Add(new Layer("0 (tło)"));
+            layers.Add(new Layer("1"));
 
             foreach (var layer in layers)
             {
@@ -241,7 +241,7 @@ namespace GraphicEditorWPF
                     encoder.Save(fileStream);
                 }
 
-                MessageBox.Show("Image saved successfully!", "Save Image", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Obraz zapisany!", "Save Image", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
