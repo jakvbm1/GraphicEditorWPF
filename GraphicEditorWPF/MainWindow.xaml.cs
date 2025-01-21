@@ -152,7 +152,11 @@ namespace GraphicEditorWPF
             removeTemporaryObjects();
         }
 
-
+        private void ButtonDrawStarClick(object sender, RoutedEventArgs e)
+        {
+            drawStyle = 13;
+            removeTemporaryObjects();
+        }
         private void AddNewLayer(string name)
         {
             var newLayer = new Layer(name);
@@ -533,6 +537,44 @@ namespace GraphicEditorWPF
 
                         break;
                     }
+
+                case 13:
+                    {
+
+                        Polygon polygon = new Polygon();
+
+                        // Get mouse position relative to the canvas
+                        double mouseX = e.GetPosition(this).X - window.Width / 3.5;
+                        double mouseY = e.GetPosition(this).Y;
+
+                        // Define the size of the star
+                        double polygonSize = 30; // Adjust size as needed
+
+                        // Calculate the points for the star
+                        Point p1 = new Point(mouseX, mouseY - polygonSize); // Top point
+                        Point p2 = new Point(mouseX + 0.363 * polygonSize, mouseY - 0.309 * polygonSize); // Top-right inner
+                        Point p3 = new Point(mouseX + 0.951 * polygonSize, mouseY - 0.309 * polygonSize); // Right outer
+                        Point p4 = new Point(mouseX + 0.363 * polygonSize, mouseY + 0.118 * polygonSize); // Bottom-right inner
+                        Point p5 = new Point(mouseX + 0.588 * polygonSize, mouseY + 0.809 * polygonSize); // Bottom-right outer
+                        Point p6 = new Point(mouseX, mouseY + 0.382 * polygonSize); // Bottom inner
+                        Point p7 = new Point(mouseX - 0.588 * polygonSize, mouseY + 0.809 * polygonSize); // Bottom-left outer
+                        Point p8 = new Point(mouseX - 0.363 * polygonSize, mouseY + 0.118 * polygonSize); // Bottom-left inner
+                        Point p9 = new Point(mouseX - 0.951 * polygonSize, mouseY - 0.309 * polygonSize); // Left outer
+                        Point p10 = new Point(mouseX - 0.363 * polygonSize, mouseY - 0.309 * polygonSize); // Top-left inner
+
+                        // Assign points to the polygon
+                        polygon.Points = new System.Windows.Media.PointCollection() { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 };
+
+                        // Set stroke and fill for the star
+                        Brush brushColor = new SolidColorBrush(selectedColor); // Assuming selectedColor is defined
+                        polygon.Stroke = brushColor;
+                        polygon.Fill = new SolidColorBrush(Color.FromArgb(128, selectedColor.R, selectedColor.G, selectedColor.B)); // Semi-transparent fill
+
+                        // Add the star to the active layer
+                        layers[activeLayerIndex].LayerCanvas.Children.Add(polygon);
+                        break;
+                    }
+
             }
         }
 

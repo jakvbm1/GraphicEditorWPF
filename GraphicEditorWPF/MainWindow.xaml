@@ -44,7 +44,8 @@
 								<MenuItem x:Name="buttonDrawArrow" Click="ButtonArrowClick" Header="Rysowanie Strzalki"/>
 								<MenuItem x:Name="buttonDrawRhombus" Click="ButtonRhombusClick" Header="Rysowanie Rombu"/>
 								<MenuItem x:Name="buttonDrawTrapezium" Click="ButtonTrapeziumClick" Header="Rysowanie Trapezu"/>
-							</MenuItem>
+                                <MenuItem x:Name="ButtonDrawStar" Click="ButtonDrawStarClick" Header="Rysowanie gwiazdy"/>
+                            </MenuItem>
 						</Menu>
 						<Menu>
 							<MenuItem Header="Narzedzia">
