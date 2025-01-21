@@ -83,55 +83,88 @@ namespace GraphicEditorWPF
 
         private void MatrixFilter_Click(object sender, RoutedEventArgs e)
         {
-            float[,] filter = generateFilter();
-            Bitmap converted = BitmapImage2Bitmap(bip);
+            try
+            {
+                float[,] filter = generateFilter();
+                Bitmap converted = BitmapImage2Bitmap(bip);
 
-            System.Drawing.Rectangle rectangle = new System.Drawing.Rectangle(0, 0, converted.Width, converted.Height);//System.Drawing
-            BitmapData bmpData = converted.LockBits(rectangle, ImageLockMode.ReadWrite, converted.PixelFormat);//System.Drawing.Imag
-            Image<Bgr, Byte> prefiltered = new Image<Bgr, Byte>(converted.Width, converted.Height, bmpData.Stride, bmpData.Scan0);
+                // Ensure correct pixel format
+                if (converted.PixelFormat != System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+                {
+                    Bitmap temp2 = new Bitmap(converted.Width, converted.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    using (Graphics g = Graphics.FromImage(temp2))
+                    {
+                        g.DrawImage(converted, 0, 0);
+                    }
+                    converted = temp2;
+                }
 
-            ConvolutionKernelF kernel = new ConvolutionKernelF(filter);
-            Image<Bgr, float> filtered = prefiltered.Convolution(kernel);
-            Bitmap temp = filtered.ToBitmap();
-            this.bip = Bitmap2BitmapImage(temp);
-            ImageSpace.Source = bip;
+                System.Drawing.Rectangle rectangle = new System.Drawing.Rectangle(0, 0, converted.Width, converted.Height);
+                BitmapData bmpData = converted.LockBits(rectangle, ImageLockMode.ReadWrite, converted.PixelFormat);
 
+                // Process image
+                Image<Bgr, Byte> prefiltered = new Image<Bgr, Byte>(converted.Width, converted.Height, bmpData.Stride, bmpData.Scan0);
+                ConvolutionKernelF kernel = new ConvolutionKernelF(filter);
+                Image<Bgr, float> filtered = prefiltered.Convolution(kernel);
 
+                // Normalize pixel values and convert back to Bitmap
+                Image<Bgr, Byte> normalized = filtered.Convert<Bgr, Byte>();
+                Bitmap temp = normalized.ToBitmap();
 
+                // Unlock image data
+                converted.UnlockBits(bmpData);
+
+                this.bip = Bitmap2BitmapImage(temp);
+                ImageSpace.Source = bip;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Zastosowanie filtru nie powiodło się, wystąpił błąd: {ex.Message}");
+            }
         }
+
 
         private float[,] generateFilter()
         {
             float[,] filter = new float[3, 3];
 
+            // A default filter (identity matrix)
+            float[,] defaultFilter = {
+        { 0, 0, 0 },
+        { 0, 1, 0 },
+        { 0, 0, 0 }
+    };
+
             try
             {
-                filter[0, 0] = float.Parse(Matrix11.Text);
-                filter[0, 1] = float.Parse(Matrix12.Text);
-                filter[0, 2] = float.Parse(Matrix13.Text);
+                bool valid = true;
 
-                filter[1, 0] = float.Parse(Matrix21.Text);
-                filter[1, 1] = float.Parse(Matrix22.Text);
-                filter[1, 2] = float.Parse(Matrix23.Text);
+                valid &= float.TryParse(Matrix11.Text, out filter[0, 0]);
+                valid &= float.TryParse(Matrix12.Text, out filter[0, 1]);
+                valid &= float.TryParse(Matrix13.Text, out filter[0, 2]);
 
-                filter[2, 0] = float.Parse(Matrix31.Text);
-                filter[2, 1] = float.Parse(Matrix32.Text);
-                filter[2, 2] = float.Parse(Matrix33.Text);
+                valid &= float.TryParse(Matrix21.Text, out filter[1, 0]);
+                valid &= float.TryParse(Matrix22.Text, out filter[1, 1]);
+                valid &= float.TryParse(Matrix23.Text, out filter[1, 2]);
 
-                return filter;
-            }
+                valid &= float.TryParse(Matrix31.Text, out filter[2, 0]);
+                valid &= float.TryParse(Matrix32.Text, out filter[2, 1]);
+                valid &= float.TryParse(Matrix33.Text, out filter[2, 2]);
 
-            catch(Exception ex) 
-            {
-                MessageBox.Show("Wprowadzono nieprawidłowe dane, upewnij się, że wprowadzono poprawne liczby");
-                for(int i = 0; i < 3;)
+                if (!valid)
                 {
-                    for (int j = 0; j < 3;)
-                        filter[i, j] = 1;
+                    throw new FormatException("Wykryto niepoprawne dane.");
                 }
-                return filter;
             }
+            catch (Exception)
+            {
+                MessageBox.Show("Wprowadzono niepoprawne dane, upewnij się, że w każdej komórce macierzy znajduje się poprawna liczba .");
+                filter = defaultFilter;
+            }
+
+            return filter;
         }
+
 
         private void AddImageButton_Click(object sender, RoutedEventArgs e)
         {

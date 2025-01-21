@@ -1,4 +1,4 @@
-﻿using Emgu.CV.Face;
+﻿
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -66,16 +66,6 @@ namespace GraphicEditorWPF
             LayerList.SelectedIndex = 0;
         }
 
-        private void ToggleLayerVisibility(object sender, RoutedEventArgs e)
-        {
-            CheckBox checkBox = sender as CheckBox;
-            var layer = (Layer)checkBox.DataContext;
-
-            if (layer != null)
-            {
-                layer.LayerCanvas.Visibility = layer.IsVisible ? Visibility.Visible : Visibility.Collapsed;
-            }
-        }
 
         private void LayerList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -155,6 +145,14 @@ namespace GraphicEditorWPF
             drawStyle=11;
             removeTemporaryObjects();
         }
+
+        private void EraserButtonClick(object sender, RoutedEventArgs e)
+        {
+            drawStyle = 12;
+            removeTemporaryObjects();
+        }
+
+
         private void AddNewLayer(string name)
         {
             var newLayer = new Layer(name);
@@ -286,6 +284,22 @@ namespace GraphicEditorWPF
                             }
                         }
                         break;
+
+                    case 12:
+                        {
+                            var clickedElement = e.Source as FrameworkElement;
+
+                            if (clickedElement != null)
+                            {
+                                if (layers[activeLayerIndex].LayerCanvas.Children.Contains(clickedElement))
+                                {
+                                    layers[activeLayerIndex].LayerCanvas.Children.Remove(clickedElement);
+                                }
+                            }
+
+                            break;
+                        }
+
 
                 }
             }
@@ -502,6 +516,21 @@ namespace GraphicEditorWPF
                             lineStart = e.GetPosition(this);
 
                         }
+                        break;
+                    }
+
+                case 12:
+                    {
+                        var clickedElement = e.Source as FrameworkElement;
+                        
+                        if (clickedElement != null)
+                        {
+                           if(layers[activeLayerIndex].LayerCanvas.Children.Contains(clickedElement))
+                            {
+                                layers[activeLayerIndex].LayerCanvas.Children.Remove(clickedElement);
+                            }
+                        }
+
                         break;
                     }
             }

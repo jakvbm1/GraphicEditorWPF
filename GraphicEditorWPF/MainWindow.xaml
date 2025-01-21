@@ -49,8 +49,9 @@
 						<Menu>
 							<MenuItem Header="Narzedzia">
 								<MenuItem Header="Edycja istniejących obiektów" x:Name="ButtonEditLine" Click="ButtonEditLineClick"/>
-								<MenuItem Header="Zapis do png" x:Name="ButtonPNGSave" Click="PngSaveClick"/>
-							</MenuItem>
+								<MenuItem Header="Zapis do pliku" x:Name="ButtonPNGSave" Click="PngSaveClick"/>
+                                <MenuItem Header="Gumka" x:Name="EraserButton" Click="EraserButtonClick"/>
+                            </MenuItem>
 						</Menu>
 					</ToolBar>
 				</ToolBarPanel>
