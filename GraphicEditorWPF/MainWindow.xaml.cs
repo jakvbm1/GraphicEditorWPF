@@ -615,7 +615,7 @@ namespace GraphicEditorWPF
             Image uploaded = new Image();
             uploaded.Source = bp;
 
-            paintSurface.Children.Add(uploaded);
+            layers[activeLayerIndex].LayerCanvas.Children.Add(uploaded);
             uploaded.MouseLeftButtonDown += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonDown;
             uploaded.MouseMove += ((MainWindow)Application.Current.MainWindow).Image_MouseMove;
             uploaded.MouseLeftButtonUp += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonUp;
