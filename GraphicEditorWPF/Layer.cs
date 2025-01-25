@@ -10,7 +10,6 @@ namespace GraphicEditorWPF
     public class Layer
     {
         public Canvas LayerCanvas { get; set; }
-        public bool IsVisible { get; set; } = true;
         public string Name { get; set; }
 
         public Layer(string name)

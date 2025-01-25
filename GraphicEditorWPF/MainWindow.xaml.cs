@@ -167,13 +167,24 @@ namespace GraphicEditorWPF
 
         private void DeleteLayer(int index)
         {
-            if (index >= 0 && index < layers.Count)
+            if (index >= 0 && index < layers.Count && layers.Count > 1)
             {
                 paintSurface.Children.Remove(layers[index].LayerCanvas);
                 layers.RemoveAt(index);
                 LayerList.Items.Refresh();
+
+                if (layers.Count > 0)
+                {
+                    activeLayerIndex = Math.Min(index, layers.Count - 1);
+                    LayerList.SelectedIndex = activeLayerIndex;
+                }
+                else
+                {
+                    activeLayerIndex = -1;
+                }
             }
         }
+
 
 
 
@@ -317,7 +328,7 @@ namespace GraphicEditorWPF
             }
         }
 
-        private void paintSurface_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+         private void paintSurface_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             switch (drawStyle)
             {
@@ -568,7 +579,7 @@ namespace GraphicEditorWPF
                         // Set stroke and fill for the star
                         Brush brushColor = new SolidColorBrush(selectedColor); // Assuming selectedColor is defined
                         polygon.Stroke = brushColor;
-                        polygon.Fill = new SolidColorBrush(Color.FromArgb(128, selectedColor.R, selectedColor.G, selectedColor.B)); // Semi-transparent fill
+                        
 
                         // Add the star to the active layer
                         layers[activeLayerIndex].LayerCanvas.Children.Add(polygon);
@@ -624,6 +635,7 @@ namespace GraphicEditorWPF
                 paintSurface.Children.Remove(end2);
             }
             selectedEnd = null;
+            lineStart = null;
         }
 
         private void paintSurface_MouseDown(object sender, MouseButtonEventArgs e)
@@ -661,6 +673,7 @@ namespace GraphicEditorWPF
             uploaded.MouseLeftButtonDown += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonDown;
             uploaded.MouseMove += ((MainWindow)Application.Current.MainWindow).Image_MouseMove;
             uploaded.MouseLeftButtonUp += ((MainWindow)Application.Current.MainWindow).Image_MouseLeftButtonUp;
+            if (activeLayerIndex >= layers.Count) { activeLayerIndex--; }
         }
 
         public void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -712,6 +725,8 @@ namespace GraphicEditorWPF
         private void RemoveLayerButton_Click(object sender, RoutedEventArgs e)
         {
             DeleteLayer(activeLayerIndex);
+            LayerList.SelectedIndex = activeLayerIndex;
+            LayerList.Items.Refresh();
         }
 
         private void LayerChanged(object sender, RoutedEventArgs e)
